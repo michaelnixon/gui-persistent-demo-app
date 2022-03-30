@@ -10,9 +10,9 @@ class App(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        # this is the main database access object, currently connected through
-        # the shelve module
-        self.data = ShelveStorage()
+        # this is the main database access object
+        # note you must run the init_db.py script before using SQLStorage
+        self.data = SQLStorage()
 
         # set a single font to be used throughout the app
         self.title_font = tkfont.Font(
@@ -98,6 +98,7 @@ class BrowsePage(tk.Frame):
         for record in all_records:
             self.tree.insert("", 0, values=(
                 record.rid, record.name, record.email))
+
         ''' '''
 
         # I don't love clunkiness of vertical ordering here, should use horizontal space better
@@ -177,13 +178,12 @@ class ReadPage(tk.Frame):
         button.grid(row=4, column=0)
 
     def update(self, rid):
-        record_id = "record" + str(rid)
-        record = self.controller.data.get_record(record_id)
+        record = self.controller.data.get_record(rid)
         # expand this by adding each of the separate field names
         # or come up with an introspective method (for key in ..)
         self.data['Name'].dataentry.set(record.name)
         self.data['Email'].dataentry.set(record.email)
-        self.contact = self.persist.get_record(record_id)
+        self.contact = self.persist.get_record(rid)
 
     def submit(self):
         ''' grab the text placed in the entry widgets accessed through the dict 
